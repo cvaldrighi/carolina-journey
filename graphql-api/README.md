@@ -1,26 +1,26 @@
 # Carolina Journey API (NestJS + GraphQL + PostgreSQL)
 
-API GraphQL desenvolvida em NestJS que expõe minhas informações profissionais 
+API GraphQL desenvolvida em NestJS que expõe minhas informações profissionais  
 (profile, skills, experiences, education e hobbies) a partir de um banco PostgreSQL.
 
 O objetivo do projeto é demonstrar:
-- Arquitetura modular com NestJS
-- GraphQL com resolvers aninhados
-- Modelagem relacional
-- Seed idempotente (schema + dados)
-- Testes unitários e E2E
-- Preparação para deploy em Cloud Run
+
+- Arquitetura modular com NestJS  
+- GraphQL com resolvers aninhados  
+- Modelagem relacional  
+- Seed idempotente (schema + dados)  
+- Testes unitários e E2E  
 
 ---
 
 ## Stack
 
-- Node.js + TypeScript
-- NestJS
-- GraphQL (Apollo)
-- PostgreSQL
-- Docker Compose
-- Jest (unit + e2e)
+- Node.js + TypeScript  
+- NestJS  
+- GraphQL (Apollo)  
+- PostgreSQL  
+- Docker Compose  
+- Jest (unit + e2e)  
 
 ---
 
@@ -28,8 +28,8 @@ O objetivo do projeto é demonstrar:
 
 ### Pré-requisitos
 
-- Node.js (>= 18)
-- Docker + Docker Compose
+- Node.js (>= 18)  
+- Docker + Docker Compose  
 
 ---
 
@@ -37,7 +37,9 @@ O objetivo do projeto é demonstrar:
 
 Na raiz do repositório (onde está o `docker-compose.yml`):
 
+```bash
 docker compose up -d
+```
 
 > O Postgres está exposto na porta 5433 (host) → 5432 (container)
 
@@ -47,14 +49,18 @@ docker compose up -d
 
 Dentro da pasta `graphql-api`:
 
+```bash
 cp .env.example .env
+```
 
 ---
 
 ### 3) Instalar dependências
 
+```bash
 cd graphql-api
 npm install
+```
 
 ---
 
@@ -62,17 +68,23 @@ npm install
 
 Este comando executa `schema.sql` e depois `seed.sql`:
 
+```bash
 npm run seed
+```
 
 ---
 
 ### 5) Subir a API
 
+```bash
 npm run start:dev
+```
 
 A API ficará disponível em:
 
+```
 http://localhost:3000/graphql
+```
 
 ---
 
@@ -80,6 +92,7 @@ http://localhost:3000/graphql
 
 ### Profile
 
+```graphql
 query {
   profile {
     name
@@ -89,22 +102,26 @@ query {
     birthDate
   }
 }
+```
 
 ---
 
 ### Skills
 
+```graphql
 query {
   skills {
     name
     category
   }
 }
+```
 
 ---
 
 ### Experiences (com nested fields)
 
+```graphql
 query {
   experiences {
     company
@@ -120,6 +137,7 @@ query {
     }
   }
 }
+```
 
 ---
 
@@ -127,7 +145,9 @@ query {
 
 ### Unit tests
 
+```bash
 npm run test
+```
 
 ---
 
@@ -135,12 +155,15 @@ npm run test
 
 (Requer banco rodando e seed executado)
 
+```bash
 npm run test:e2e
+```
 
 ---
 
 ## Estrutura Resumida
 
+```text
 src/
  ├── modules/
  │    ├── profile/
@@ -155,19 +178,20 @@ src/
  │    └── seed.ts
  │
  └── app.module.ts
+```
 
 ---
 
 ## Próximos passos
 
-- Deploy da API GraphQL no Google Cloud Run
-- Criação de Cloud Run Function consumindo o GraphQL
-- Exposição pública de endpoint para consulta das informações
+- Deploy da API GraphQL no Google Cloud Run  
+- Criação de Cloud Run Function consumindo o GraphQL  
+- Exposição pública de endpoint para consulta das informações  
 
 ---
 
 ## Observações
 
-- O seed é idempotente: pode ser executado múltiplas vezes sem duplicar dados.
-- A arquitetura separa claramente domínio, acesso a dados e camada GraphQL.
+- O seed é idempotente: pode ser executado múltiplas vezes sem duplicar dados.  
+- A arquitetura separa claramente domínio, acesso a dados e camada GraphQL.  
 - Testes unitários focam na lógica de serviço; testes E2E validam a integração completa via GraphQL.
