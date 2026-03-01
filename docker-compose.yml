@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: carol_journey_postgres
+    environment:
+      POSTGRES_USER: carol
+      POSTGRES_PASSWORD: carol
+      POSTGRES_DB: carolina_journey
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
