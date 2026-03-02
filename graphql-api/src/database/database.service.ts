@@ -15,6 +15,10 @@ export class DatabaseService implements OnModuleDestroy {
       user: this.configService.get<string>('DB_USER'),
       password: this.configService.get<string>('DB_PASSWORD'),
       database: this.configService.get<string>('DB_NAME'),
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      family: 4,      
     });
 
     this.pool.on('connect', () => {
