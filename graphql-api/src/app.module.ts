@@ -26,7 +26,9 @@ import { ExperiencesModule } from './modules/experiences/experiences.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      playground: true,
+      playground: false,
+      introspection: true,
+      csrfPrevention: false,
     }),
   ],
 })
