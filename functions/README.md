@@ -9,13 +9,13 @@ Elas consomem a API GraphQL pública e retornam respostas já processadas e orga
 
 ## Arquitetura
 
-Supabase (PostgreSQL)
-        ↓
-Cloud Run (NestJS + GraphQL)
-        ↓
-Cloud Functions Gen2 (HTTP)
-        ↓
-Endpoints públicos em JSON
+- Supabase (PostgreSQL)
+
+- Cloud Run (NestJS + GraphQL)
+        
+- Cloud Functions Gen2 (HTTP)
+        
+- Endpoints públicos em JSON
 
 ---
 
@@ -91,8 +91,13 @@ npm run build
 npm start
 ```
 
----
+Disponível em:
 
+```
+http://localhost:8080
+```
+
+---
 ### Deploy
 
 ```
