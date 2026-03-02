@@ -4,7 +4,7 @@ BEGIN;
 -- EDUCATION
 -- =========================
 
-INSERT INTO education (id, institution, degree, start_date, end_date, created_at, course)
+INSERT INTO education (id, institution, course, start_date, end_date, created_at, degree)
 VALUES
 ('1e9104c8-fea7-4076-ba03-30e357dd512f', 'UNIP', 'Análise e Desenvolvimento de Sistemas', '2021-01-01', '2022-12-01', '2026-03-01 00:47:30.361473', 'Nivel Superior'),
 ('6b47ed31-c3e4-421f-9940-9353875a5540', 'FATEC (Rubens Lara)', 'Gestão Portuaria', '2017-01-01', '2020-06-01', '2026-03-01 00:47:30.361473', 'Nivel Superior')
