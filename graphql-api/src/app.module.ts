@@ -11,7 +11,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { HobbiesModule } from './modules/hobbies/hobbies.module';
 import { EducationModule } from './modules/education/education.module';
 import { ExperiencesModule } from './modules/experiences/experiences.module';
-import { ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { ApolloServerPluginLandingPageProductionDefault } from '@apollo/server/p
       introspection: true,
       csrfPrevention: false,
       plugins: [
-        ApolloServerPluginLandingPageProductionDefault(),
+        ApolloServerPluginLandingPageLocalDefault({embed: true}),
       ],
     }),
   ],
