@@ -46,7 +46,6 @@ Cloud Functions Gen2 (HTTP endpoints formatados)
 - A API GraphQL centraliza acesso aos dados.
 - As Cloud Functions consomem a API e retornam respostas agregadas/formatadas.
 - Não há acesso direto ao banco pelas Functions.
-- Serviços desacoplados.
 
 ---
 
@@ -66,7 +65,7 @@ Cloud Functions Gen2 (HTTP endpoints formatados)
 - Google Cloud Functions Gen2
 - Supabase (PostgreSQL gerenciado)
 
-### Dev & Qualidade
+### Devops & Qualidade
 
 - Docker / Docker Compose
 - Jest (unit + e2e)
