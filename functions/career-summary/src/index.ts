@@ -1,7 +1,8 @@
 import axios from 'axios';
 import 'dotenv/config';
 
-const GRAPHQL_URL = process.env.GRAPHQL_URL!;
+const GRAPHQL_URL =
+  process.env.GRAPHQL_URL ?? 'http://localhost:8080/graphql';
 
 export const careerSummary = async (req: any, res: any) => {
   try {

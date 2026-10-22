@@ -1,21 +1,10 @@
-# Cloud Functions (Gen2)
+# Functions (Cloud Functions Gen2)
 
-Esta pasta contém as Cloud Functions (Gen2) responsáveis por consumir a API GraphQL publicada no Cloud Run e expor endpoints HTTP com dados formatados.
+Esta pasta contém duas functions HTTP que consomem a API GraphQL e expõem endpoints com dados já processados e formatados.
 
-As funções **não acessam o banco diretamente**.  
-Elas consomem a API GraphQL pública e retornam respostas já processadas e organizadas.
+As functions **não acessam o banco diretamente**. Toda a lógica de acesso a dados fica centralizada na API GraphQL.
 
----
-
-## Arquitetura
-
-- Supabase (PostgreSQL)
-
-- Cloud Run (NestJS + GraphQL)
-        
-- Cloud Functions Gen2 (HTTP)
-        
-- Endpoints públicos em JSON
+Elas usam o [`@google-cloud/functions-framework`](https://github.com/GoogleCloudPlatform/functions-framework-nodejs), o mesmo runtime das Cloud Functions Gen2. Por isso rodam igualmente na nuvem, em um container Docker ou direto com Node.
 
 ---
 
@@ -23,15 +12,16 @@ Elas consomem a API GraphQL pública e retornam respostas já processadas e orga
 
 ```
 functions/
+ ├── Dockerfile          # imagem compartilhada (a function é escolhida por FUNCTION_TARGET)
  ├── profile-summary/
  └── career-summary/
 ```
 
-Cada pasta representa uma Cloud Function independente.
+Cada pasta é uma function independente, com seu próprio `package.json`.
 
 ---
 
-# profile-summary
+## profile-summary
 
 Retorna:
 
@@ -40,40 +30,7 @@ Retorna:
 - Idade calculada
 - Lista de hobbies
 
-### Rodando localmente
-
-```
-cd profile-summary
-npm install
-npm run build
-npm start
-```
-
-Disponível em:
-
-```
-http://localhost:8080
-```
-
----
-
-### Deploy
-
-```
-gcloud functions deploy profileSummary \
-  --gen2 \
-  --runtime=nodejs20 \
-  --region=southamerica-east1 \
-  --source=. \
-  --entry-point=profileSummary \
-  --trigger-http \
-  --allow-unauthenticated \
-  --set-env-vars GRAPHQL_URL=https://carolina-journey-graphql-327193036656.southamerica-east1.run.app/graphql
-```
-
----
-
-# career-summary
+## career-summary
 
 Retorna:
 
@@ -82,51 +39,70 @@ Retorna:
 - Skills por experiência
 - Highlights por experiência
 
-### Rodando localmente
+---
 
-```
-cd career-summary
+## Rodando localmente
+
+O jeito mais simples é o `docker compose up -d --build` na raiz do repositório. As functions sobem em:
+
+| Function | URL |
+|---|---|
+| `profileSummary` | http://localhost:8081 |
+| `careerSummary` | http://localhost:8082 |
+
+### Sem Docker (para desenvolver)
+
+Com a API GraphQL rodando em `http://localhost:8080/graphql`:
+
+```bash
+cd profile-summary   # ou career-summary
+cp .env.example .env
 npm install
 npm run build
 npm start
 ```
 
-Disponível em:
+Por padrão, `profile-summary` sobe na porta **8081** e `career-summary` na **8082**. Para usar outra porta, rode `PORT=9000 npm start`.
 
-```
-http://localhost:8080
-```
+### Variáveis de ambiente
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `GRAPHQL_URL` | URL da API GraphQL consumida pela function | `http://localhost:8080/graphql` |
 
 ---
-### Deploy
 
+## Deploy no Google Cloud
+
+> Os endpoints em nuvem estão desativados no momento. Os comandos ficam como referência.
+
+```bash
+gcloud functions deploy profileSummary \
+  --gen2 \
+  --runtime=nodejs22 \
+  --region=southamerica-east1 \
+  --source=./profile-summary \
+  --entry-point=profileSummary \
+  --trigger-http \
+  --allow-unauthenticated \
+  --set-env-vars GRAPHQL_URL=<url-da-api-no-cloud-run>/graphql
 ```
+
+```bash
 gcloud functions deploy careerSummary \
   --gen2 \
-  --runtime=nodejs20 \
+  --runtime=nodejs22 \
   --region=southamerica-east1 \
-  --source=. \
+  --source=./career-summary \
   --entry-point=careerSummary \
   --trigger-http \
   --allow-unauthenticated \
-  --set-env-vars GRAPHQL_URL=https://carolina-journey-graphql-327193036656.southamerica-east1.run.app/graphql
-```
-
----
-
-## Variáveis de Ambiente
-
-Cada função precisa da variável:
-
-```
-GRAPHQL_URL=https://carolina-journey-graphql-327193036656.southamerica-east1.run.app/graphql
+  --set-env-vars GRAPHQL_URL=<url-da-api-no-cloud-run>/graphql
 ```
 
 ---
 
 ## Observações
 
-- As funções são stateless.
-- Não há conexão direta com o banco.
-- Toda a lógica de acesso a dados está centralizada na API GraphQL.
-- O objetivo aqui é demonstrar integração entre serviços em nuvem e transformação de dados.
+- As functions são stateless.
+- O objetivo é demonstrar integração entre serviços e transformação de dados.

@@ -1,6 +1,7 @@
-version: "3.9"
+name: carolina-journey
 
 services:
+  # Banco de dados
   postgres:
     image: postgres:15
     container_name: carol_journey_postgres
@@ -12,6 +13,89 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carol -d carolina_journey"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  # Aplica schema + seed (idempotente) sempre que o ambiente sobe
+  seed:
+    image: postgres:15
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: carol
+      PGPASSWORD: carol
+      PGDATABASE: carolina_journey
+      PGOPTIONS: "-c client_min_messages=warning"
+    volumes:
+      - ./graphql-api/src/database/seed:/seed:ro
+    command:
+      - psql
+      - -v
+      - ON_ERROR_STOP=1
+      - -q
+      - -f
+      - /seed/schema.sql
+      - -f
+      - /seed/seed.sql
+    restart: "no"
+
+  # API GraphQL (NestJS)
+  api:
+    build: ./graphql-api
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: carol
+      DB_PASSWORD: carol
+      DB_NAME: carolina_journey
+      DB_SSL: "false"
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:8080/graphql',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({query:'{__typename}'})}).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  # Functions (mesmo runtime das Cloud Functions Gen2: functions-framework)
+  profile-summary:
+    build:
+      context: ./functions/profile-summary
+      dockerfile: ../Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      FUNCTION_TARGET: profileSummary
+      GRAPHQL_URL: http://api:8080/graphql
+    ports:
+      - "8081:8080"
+
+  career-summary:
+    build:
+      context: ./functions/career-summary
+      dockerfile: ../Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      FUNCTION_TARGET: careerSummary
+      GRAPHQL_URL: http://api:8080/graphql
+    ports:
+      - "8082:8080"
 
 volumes:
   postgres_data:

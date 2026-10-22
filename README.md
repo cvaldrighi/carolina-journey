@@ -1,127 +1,147 @@
 # Carolina Journey
 
-Projeto com arquitetura em nuvem utilizando:
+[![CI](https://github.com/cvaldrighi/carolina-journey/actions/workflows/ci.yml/badge.svg)](https://github.com/cvaldrighi/carolina-journey/actions/workflows/ci.yml)
 
-- PostgreSQL (Supabase)
-- NestJS + GraphQL (Cloud Run)
-- Google Cloud Functions Gen2
-- Docker
-- Testes unitários e E2E
+Arquitetura em camadas que expõe minha trajetória profissional (perfil, experiências, skills, formação e hobbies) através de:
+
+- **PostgreSQL**: camada de dados
+- **NestJS + GraphQL (Apollo)**: camada de domínio
+- **Functions HTTP (Google Cloud Functions Gen2 / functions-framework)**: camada de apresentação/transformação
+
+Todo o ambiente roda localmente com **um único comando**, via Docker Compose.
 
 ---
 
-## Objetivo do Projeto
+## Rodando em 1 minuto
 
-O objetivo deste projeto foi construir uma arquitetura moderna e modular utilizando tecnologias amplamente adotadas no mercado.
+**Pré-requisito:** Docker (Docker Desktop, OrbStack, Colima ou Docker Engine no Linux).
 
-Para contextualizar os dados, optei por representar as informações com meu próprio perfil profissional.  
+```bash
+git clone https://github.com/cvaldrighi/carolina-journey.git
+cd carolina-journey
+docker compose up -d --build
+```
 
-Apesar disso, a arquitetura construída aqui pode ser aplicada em:
+Isso sobe o Postgres, aplica o schema e o seed, e inicia a API GraphQL e as duas functions.
 
-- APIs públicas desacopladas
-- Processamento e agregação de dados
-- Integração entre serviços em nuvem
-- Microsserviços de consulta e transformação de dados
-- Camadas intermediárias entre banco e frontend
-- Serviços que exigem separação entre domínio e apresentação
+| Serviço | URL |
+|---|---|
+| API GraphQL + Apollo Sandbox | http://localhost:8080/graphql |
+| Function `profileSummary` | http://localhost:8081 |
+| Function `careerSummary` | http://localhost:8082 |
+| PostgreSQL | `localhost:5433` (user `carol` / senha `carol` / db `carolina_journey`) |
 
-A separação entre:
+Para conferir se está tudo de pé:
 
-- Camada de dados (PostgreSQL)
-- Camada de domínio (GraphQL)
-- Camada de apresentação/transformação (Cloud Functions)
+```bash
+./scripts/smoke-test.sh
+```
 
-permite escalabilidade e desacoplamento entre serviços.
+Para derrubar o ambiente (`-v` também apaga os dados do banco):
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Experimentando
+
+Abra http://localhost:8080/graphql no navegador e rode, por exemplo:
+
+```graphql
+query {
+  experiences {
+    company
+    jobTitle
+    startDate
+    endDate
+    skills { name category }
+    highlights { description }
+  }
+}
+```
+
+Ou chame as functions, que consomem a API e devolvem os dados já agregados:
+
+```bash
+curl http://localhost:8081   # perfil + idade calculada + hobbies
+curl http://localhost:8082   # experiências ordenadas, com skills e highlights
+```
 
 ---
 
 ## Arquitetura
 
-Supabase (PostgreSQL)
+```mermaid
+flowchart LR
+    DB[(PostgreSQL)] --> API[NestJS + GraphQL API]
+    API --> F1[profileSummary]
+    API --> F2[careerSummary]
+    F1 --> C((Cliente HTTP))
+    F2 --> C
+```
+
+- A API GraphQL centraliza todo o acesso aos dados.
+- As functions consomem a API via HTTP e retornam respostas agregadas e formatadas.
+- As functions **não acessam o banco diretamente**.
+
+Essa separação entre dados, domínio e apresentação permite escalar e evoluir cada camada de forma independente. É um padrão aplicável a APIs públicas desacopladas, BFFs, microsserviços de consulta e camadas intermediárias entre banco e frontend.
+
+---
+
+## Stack
+
+**Backend:** Node.js 22, TypeScript, NestJS, GraphQL (Apollo), PostgreSQL
+
+**Qualidade:** Jest (testes unitários + E2E), seed idempotente, CI no GitHub Actions
+
+**Infra:** Docker multi-stage, Docker Compose, Google Cloud Run, Cloud Functions Gen2, Supabase
+
+---
+
+## Integração contínua
+
+A cada push, o [GitHub Actions](.github/workflows/ci.yml):
+
+1. Builda a API, sobe um Postgres, roda o seed e executa os testes **unitários e E2E**
+2. Builda as duas functions
+3. Sobe o **ambiente completo via Docker Compose** e valida os endpoints com o [smoke test](scripts/smoke-test.sh)
+
+---
+
+## Deploy em nuvem (Google Cloud)
+
+O projeto foi publicado no Google Cloud com a seguinte topologia:
+
+```
+Supabase (PostgreSQL gerenciado)
         ↓
 Cloud Run (NestJS + GraphQL API)
         ↓
-Cloud Functions Gen2 (HTTP endpoints formatados)
+Cloud Functions Gen2 (endpoints HTTP formatados)
+```
 
-- A API GraphQL centraliza acesso aos dados.
-- As Cloud Functions consomem a API e retornam respostas agregadas/formatadas.
-- Não há acesso direto ao banco pelas Functions.
+Os endpoints públicos estão **desativados** no momento. A configuração de deploy continua documentada para referência:
+
+- API no Cloud Run: [`graphql-api/README.md`](graphql-api/README.md#deploy-no-cloud-run)
+- Functions: [`functions/README.md`](functions/README.md#deploy-no-google-cloud)
 
 ---
 
-## Stack Utilizada
+## Estrutura
 
-### Backend
-
-- Node.js
-- TypeScript
-- NestJS
-- GraphQL (Apollo)
-- PostgreSQL
-
-### Cloud
-
-- Google Cloud Run
-- Google Cloud Functions Gen2
-- Supabase (PostgreSQL gerenciado)
-
-### Devops & Qualidade
-
-- Docker / Docker Compose
-- Jest (unit + e2e)
-- Seed idempotente (schema + dados)
-
----
-
-##  Endpoints Públicos
-
-### GraphQL API (Cloud Run)
-
-```
-https://carolina-journey-graphql-327193036656.southamerica-east1.run.app/graphql
+```text
+.
+├── docker-compose.yml        # ambiente completo (postgres + seed + api + functions)
+├── graphql-api/              # API NestJS + GraphQL
+│   └── src/database/seed/    # schema.sql + seed.sql (idempotentes)
+├── functions/
+│   ├── Dockerfile            # imagem compartilhada pelas functions
+│   ├── profile-summary/
+│   └── career-summary/
+├── scripts/smoke-test.sh     # validação ponta a ponta dos endpoints
+└── .github/workflows/ci.yml
 ```
 
-Permite explorar o schema e realizar queries diretamente no Apollo Sandbox.
-
----
-
-### Cloud Function – Profile Summary
-
-```
-https://southamerica-east1-carolina-journey.cloudfunctions.net/profileSummary
-```
-
-Retorna:
-
-- Dados básicos do perfil
-- Idade calculada
-- Data formatada
-- Lista de hobbies
-
----
-
-### Cloud Function – Career Summary
-
-```
-https://southamerica-east1-carolina-journey.cloudfunctions.net/careerSummary
-```
-
-Retorna:
-
-- Total de experiências
-- Lista de experiências (mais recente primeiro)
-- Skills por experiência
-- Highlights por experiência
-
----
-
-## Executando Localmente
-
-O projeto pode ser executado localmente utilizando Docker.
-
-Instruções detalhadas estão nos READMEs internos:
-
-- `graphql-api/README.md`
-- `functions/README.md`
-
----
+Detalhes de desenvolvimento de cada parte estão nos READMEs internos: [`graphql-api`](graphql-api/README.md) e [`functions`](functions/README.md).
