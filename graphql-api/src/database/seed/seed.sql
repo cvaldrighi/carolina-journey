@@ -7,7 +7,7 @@ BEGIN;
 INSERT INTO education (id, institution, course, start_date, end_date, created_at, degree)
 VALUES
 ('1e9104c8-fea7-4076-ba03-30e357dd512f', 'UNIP', 'Análise e Desenvolvimento de Sistemas', '2021-01-01', '2022-12-01', '2026-03-01 00:47:30.361473', 'Nivel Superior'),
-('6b47ed31-c3e4-421f-9940-9353875a5540', 'FATEC (Rubens Lara)', 'Gestão Portuaria', '2017-01-01', '2020-06-01', '2026-03-01 00:47:30.361473', 'Nivel Superior')
+('6b47ed31-c3e4-421f-9940-9353875a5540', 'FATEC (Rubens Lara)', 'Gestão Portuária', '2017-01-01', '2020-06-01', '2026-03-01 00:47:30.361473', 'Nivel Superior')
 ON CONFLICT (id) DO UPDATE SET
   institution = EXCLUDED.institution,
   degree = EXCLUDED.degree,
@@ -23,7 +23,8 @@ ON CONFLICT (id) DO UPDATE SET
 
 INSERT INTO experiences (id, company, job_title, start_date, end_date, created_at)
 VALUES
-('b3a8641d-4f20-455a-9929-f71829597b1a', 'Bauk Tech', 'Desenvolvedor Fullstack Pleno', '2023-09-01', NULL, '2026-02-28 19:44:16.971086'),
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'iFood (Anota AI)', 'Software Engineer', '2026-05-01', '2026-10-01', '2026-10-22 00:00:00'),
+('b3a8641d-4f20-455a-9929-f71829597b1a', 'Bauk Tech', 'Desenvolvedora Fullstack Pleno', '2023-09-01', '2026-05-01', '2026-02-28 19:44:16.971086'),
 ('871eaabd-f121-4bda-90ee-3925807a8bed', 'CBYK', 'Analista de Desenvolvimento de Sistemas', '2022-06-01', '2023-10-01', '2026-02-28 19:44:23.812791'),
 ('7189368a-450a-4b34-a98a-5aaabf9cd5c3', 'Grumft', 'Estágio em Desenvolvimento Backend', '2021-09-01', '2022-02-01', '2026-02-28 19:44:30.473089'),
 ('0586f066-c273-49ca-bfd4-754c5e1d807d', 'Kelda', 'Estágio em Desenvolvimento Fullstack', '2021-02-01', '2021-07-01', '2026-02-28 19:44:38.143868')
@@ -41,13 +42,14 @@ ON CONFLICT (id) DO UPDATE SET
 
 INSERT INTO experience_highlights (id, experience_id, description)
 VALUES
-('4953467f-fcc6-4393-a2fb-667aa3bc3d44', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Liderei a refatoração da API .NET legada para uma arquitetura multi-tenant, unificando portais por cliente em um único portal multi-projeto por meio do desenvolvimento de middleware integrado a configurações no PostgreSQL, reduzindo custos operacionais e simplificando a manutenção.'),
-('36abc6f2-42f4-4113-9aa6-9c1be83f3ccd', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Desenvolvi pipelines de processamento financeiro em Node.js (TypeScript) com processos configuráveis por cliente, incluindo aplicação de taxas de juros, gestão de estoque e cálculos financeiro, geração de CNAB e automação de fluxos regulatórios.'),
-('490f39f3-6f87-419b-afc0-58e9187bbbda', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Otimizei o processamento de grandes volumes de dados com paralelismo
-(subdivisão de volumes, paginação, bulk insert e escrita em stream), aumentando
-performance e estabilidade.'),
-('19bb1b9e-3538-4e16-aa09-bec975ec8b3a', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Estruturei a comunicação entre orquestrador e workers via mensageria,
-permitindo a execução dinâmica de pipelines baseada em configuração.'),
+('0359b711-8121-46de-a60c-6e13227eab08', '2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'Refatorei os fluxos de pagamento com cartão de crédito e Pix em microsserviços, desacoplando os casos de uso dos provedores por meio de injeção de dependência, contratos comuns e seleção dinâmica de engines, contribuindo para a redução de incidentes de pagamento; integrei engines de pagamento, incluindo estornos e fluxos assíncronos com webhooks e eventos AWS SNS.'),
+('d3ca1de3-3d99-4b58-86e2-813a96d44f9a', '2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'Desenvolvi funcionalidades em um Backend for Frontend (BFF) que centraliza a comunicação entre o frontend e os serviços de backend, eliminando a orquestração de múltiplas chamadas pelo cliente e preservando a segurança dos dados.'),
+('69d92ba1-3bbf-4076-b8db-396895532a96', '2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'Implementei uma landing page em Angular com formulários e componentes reutilizáveis do design system interno, com base em especificações do Figma.'),
+('f5e3c721-8ca5-4f6d-a6fb-af6790d425ac', '2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'Apliquei Spec-Driven Development com OpenSpec e LLMs; escrevi testes unitários e E2E; instrumentei funcionalidades com logs (Grafana), métricas (Prometheus) e documentação.'),
+('4953467f-fcc6-4393-a2fb-667aa3bc3d44', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Liderei a refatoração de uma API .NET legada para uma arquitetura multi-tenant, unificando portais por cliente em um único portal multiprojeto por meio de middleware integrado a configurações no PostgreSQL, reduzindo custos operacionais e simplificando a manutenção.'),
+('36abc6f2-42f4-4113-9aa6-9c1be83f3ccd', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Desenvolvi pipelines de processamento financeiro em Node.js (TypeScript) com processos configuráveis por cliente, incluindo aplicação de taxas de juros, gestão de estoque de recebíveis, cálculos financeiros, geração de CNAB e automação de fluxos regulatórios.'),
+('490f39f3-6f87-419b-afc0-58e9187bbbda', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Otimizei o processamento de grandes volumes de dados com paralelismo (subdivisão de volumes, paginação, bulk insert e escrita em stream), aumentando performance e estabilidade.'),
+('19bb1b9e-3538-4e16-aa09-bec975ec8b3a', 'b3a8641d-4f20-455a-9929-f71829597b1a', 'Estruturei a comunicação entre orquestrador e workers via mensageria, permitindo a execução dinâmica de pipelines baseada em configuração.'),
 ('82843a99-ebe4-412f-a38a-96567442945e', '871eaabd-f121-4bda-90ee-3925807a8bed', 'Alocada em projeto que posteriormente se consolidou como BAUK (fintech de
 soluções FIDC)'),
 ('77897af5-6e1d-4b70-9c61-f791fd6a2a28', '871eaabd-f121-4bda-90ee-3925807a8bed', 'Atuei no desenvolvimento e manutenção de APIs backend em Node.js
@@ -100,7 +102,15 @@ VALUES
 ('d9814e22-6ea3-4aac-8aa7-f8ab9b12cef0', 'GCP Cloud Run Functions', 'cloud', '2026-03-01 00:13:34.573536'),
 ('e19a271d-36d2-4448-b130-b7aa7c90fae8', 'Jest', 'testing', '2026-03-01 00:13:34.573536'),
 ('e2bfb52d-37ac-4c19-88af-cb0160cb6a1c', 'Javascript', 'frontend', '2026-03-01 00:35:55.645767'),
-('5a068efb-1d0a-4e8a-82e9-90cf2ee3f7f6', 'AdobeXD', 'design', '2026-03-01 00:35:55.645767')
+('5a068efb-1d0a-4e8a-82e9-90cf2ee3f7f6', 'AdobeXD', 'design', '2026-03-01 00:35:55.645767'),
+('b9cb8764-68fe-4e3d-8327-d0f87646a88d', 'Angular', 'frontend', '2026-10-22 00:00:00'),
+('822dfa56-500f-4078-ae1c-8cb4ce20a4b8', 'AWS SNS', 'cloud', '2026-10-22 00:00:00'),
+('dfd6b916-6beb-4dea-b238-07498a9f598a', 'Grafana', 'observability', '2026-10-22 00:00:00'),
+('9be04776-17d7-4d85-b7ec-402cfe5a2302', 'Prometheus', 'observability', '2026-10-22 00:00:00'),
+('4d1d786a-2ff1-4e23-80e8-22062c1b0f09', 'Spec-Driven Development (OpenSpec)', 'architecture', '2026-10-22 00:00:00'),
+('5f7284c9-615e-4cb5-a85f-afa23a05e88b', 'Python', 'backend', '2026-10-22 00:00:00'),
+('42aa6b86-6031-49e6-80c7-4cbc8292e9a5', 'Solidity', 'backend', '2026-10-22 00:00:00'),
+('8cd8a936-8fa6-4a0b-8c8c-b8871aef9b37', 'Azure', 'cloud', '2026-10-22 00:00:00')
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   category = EXCLUDED.category,
@@ -113,6 +123,11 @@ ON CONFLICT (id) DO UPDATE SET
 
 INSERT INTO experience_skills (experience_id, skill_id)
 VALUES
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'b9cb8764-68fe-4e3d-8327-d0f87646a88d'),
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', '822dfa56-500f-4078-ae1c-8cb4ce20a4b8'),
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', 'dfd6b916-6beb-4dea-b238-07498a9f598a'),
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', '9be04776-17d7-4d85-b7ec-402cfe5a2302'),
+('2e55f513-1617-44f0-a7c2-76fbb0fa2505', '4d1d786a-2ff1-4e23-80e8-22062c1b0f09'),
 ('b3a8641d-4f20-455a-9929-f71829597b1a', 'dbc40492-113c-4228-9576-cff7579dfdcc'),
 ('b3a8641d-4f20-455a-9929-f71829597b1a', '901273d2-6fa8-4072-8455-8b584075035c'),
 ('b3a8641d-4f20-455a-9929-f71829597b1a', '4cfa7069-00ee-46bf-9353-4b6cf909a484'),
@@ -176,7 +191,7 @@ ON CONFLICT (id) DO UPDATE SET
 
 INSERT INTO profile (id, name, birth_date, job_title, city, email, created_at)
 VALUES
-('6be91790-ae8e-47b1-91c5-4184fce11441', 'Carolina Longo Valdrighi', '1999-03-24', 'Backend Developer', 'Santos', 'valdrighdev@gmail.com', '2026-03-01 01:08:08.96915')
+('6be91790-ae8e-47b1-91c5-4184fce11441', 'Carolina Longo Valdrighi', '1999-03-24', 'Engenheira de Software', 'Santos', 'valdrighdev@gmail.com', '2026-03-01 01:08:08.96915')
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   birth_date = EXCLUDED.birth_date,
