@@ -29,6 +29,7 @@ async function runSeed() {
     console.log('Seed executed successfully');
   } catch (error) {
     console.error('Seed failed:', error);
+    process.exitCode = 1;
   } finally {
     await pool.end();
     console.log('Database connection closed');
