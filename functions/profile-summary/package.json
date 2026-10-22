@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "functions-framework --target=profileSummary"
+    "start": "functions-framework --target=profileSummary --port=${PORT:-8081}"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.4.0",

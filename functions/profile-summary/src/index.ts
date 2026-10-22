@@ -1,7 +1,8 @@
 import axios from 'axios';
 import 'dotenv/config';
 
-const GRAPHQL_URL = process.env.GRAPHQL_URL!;
+const GRAPHQL_URL =
+  process.env.GRAPHQL_URL ?? 'http://localhost:8080/graphql';
 
 function calculateAge(birthDate: string): number {
   const birth = new Date(birthDate);
@@ -59,6 +60,7 @@ export const profileSummary = async (req: any, res: any) => {
       hobbies: hobbyNames
     });
   } catch (error: any) {
+    console.error(error.response?.data || error);
     res.status(500).json({ error: 'Failed to fetch profile' });
   }
 };
