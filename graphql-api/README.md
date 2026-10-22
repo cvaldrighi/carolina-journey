@@ -1,90 +1,71 @@
 # Carolina Journey API (NestJS + GraphQL + PostgreSQL)
 
-API GraphQL desenvolvida em NestJS que expõe minhas informações profissionais  
+API GraphQL desenvolvida em NestJS que expõe minhas informações profissionais
 (profile, skills, experiences, education e hobbies) a partir de um banco PostgreSQL.
 
 O objetivo do projeto é demonstrar:
 
-- Arquitetura modular com NestJS  
-- GraphQL com resolvers aninhados  
-- Modelagem relacional  
-- Seed idempotente (schema + dados)  
-- Testes unitários e E2E  
+- Arquitetura modular com NestJS
+- GraphQL com resolvers aninhados
+- Modelagem relacional
+- Seed idempotente (schema + dados)
+- Testes unitários e E2E
+
+> Só quer ver funcionando? Use o `docker compose up -d --build` na raiz do repositório (veja o [README principal](../README.md)). As instruções abaixo são para desenvolver a API localmente, com hot reload.
 
 ---
 
 ## Stack
 
-- Node.js + TypeScript  
-- NestJS  
-- GraphQL (Apollo)  
-- PostgreSQL  
-- Docker Compose  
-- Jest (unit + e2e)  
+- Node.js 22 + TypeScript
+- NestJS
+- GraphQL (Apollo)
+- PostgreSQL
+- Docker Compose
+- Jest (unit + e2e)
 
 ---
 
-## Rodando localmente
+## Desenvolvimento local
 
 ### Pré-requisitos
 
-- Node.js (>= 18)  
-- Docker + Docker Compose  
+- Node.js 22 (há um `.nvmrc` na raiz: `nvm use` ou `fnm use`)
+- Docker
 
----
+### 1) Subir só o banco (já com schema e seed)
 
-### 1) Subir o Postgres
-
-Na raiz do repositório (onde está o `docker-compose.yml`):
+Na raiz do repositório:
 
 ```bash
-docker compose up -d
+docker compose up -d seed
 ```
 
-> O Postgres está exposto na porta 5433 (host) → 5432 (container)
-
----
+O serviço `seed` depende do `postgres`, então os dois sobem juntos. O Postgres fica exposto na porta **5433** do host.
 
 ### 2) Configurar variáveis de ambiente
 
-Dentro da pasta `graphql-api`:
-
 ```bash
+cd graphql-api
 cp .env.example .env
 ```
 
----
+| Variável | Descrição |
+|---|---|
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Conexão com o Postgres |
+| `DB_SSL` | `false` para o Postgres local; `true` em produção (Supabase) |
+| `PORT` | Porta da API (padrão `8080`) |
 
-### 3) Instalar dependências
+### 3) Instalar dependências e subir a API
 
 ```bash
-cd graphql-api
 npm install
-```
-
----
-
-### 4) Criar schema + popular o banco
-
-Este comando executa `schema.sql` e depois `seed.sql`:
-
-```bash
-npm run seed
-```
-
----
-
-### 5) Subir a API
-
-```bash
 npm run start:dev
 ```
 
-A API ficará disponível em:
+A API fica disponível em http://localhost:8080/graphql.
 
-```
-http://localhost:3000/graphql
-```
+> Se alterar o `seed.sql`, rode `npm run seed` (ou `docker compose up seed` na raiz) para reaplicar. O seed é idempotente: pode ser executado várias vezes sem duplicar dados.
 
 ---
 
@@ -104,8 +85,6 @@ query {
 }
 ```
 
----
-
 ### Skills
 
 ```graphql
@@ -116,8 +95,6 @@ query {
   }
 }
 ```
-
----
 
 ### Experiences (com nested fields)
 
@@ -143,21 +120,12 @@ query {
 
 ## Testes
 
-### Unit tests
-
 ```bash
-npm run test
+npm run test       # unitários
+npm run test:e2e   # E2E (requer o banco rodando com seed)
 ```
 
----
-
-### E2E tests
-
-(Requer banco rodando e seed executado)
-
-```bash
-npm run test:e2e
-```
+Os dois rodam automaticamente no CI a cada push.
 
 ---
 
@@ -173,25 +141,36 @@ src/
  │    └── hobbies/
  │
  ├── database/
- │    ├── schema.sql
- │    ├── seed.sql
- │    └── seed.ts
+ │    ├── database.service.ts
+ │    └── seed/
+ │         ├── schema.sql
+ │         ├── seed.sql
+ │         └── seed.ts
  │
  └── app.module.ts
 ```
 
 ---
 
-## Próximos passos
+## Deploy no Cloud Run
 
-- Deploy da API GraphQL no Google Cloud Run  
-- Criação de Cloud Run Function consumindo o GraphQL  
-- Exposição pública de endpoint para consulta das informações  
+> O serviço em nuvem está desativado no momento. Os passos ficam como referência.
+
+A imagem é construída pelo `Dockerfile` (multi-stage, `node:22-alpine`). Em produção, o banco era um PostgreSQL gerenciado no Supabase, que exige SSL:
+
+```bash
+gcloud run deploy carolina-journey-graphql \
+  --source . \
+  --region=southamerica-east1 \
+  --allow-unauthenticated \
+  --set-env-vars DB_HOST=...,DB_PORT=...,DB_USER=...,DB_PASSWORD=...,DB_NAME=...,DB_SSL=true
+```
+
+> Ao buildar a imagem localmente em uma máquina ARM (ex.: Mac com Apple Silicon) para publicar no Cloud Run, use `docker build --platform linux/amd64`.
 
 ---
 
 ## Observações
 
-- O seed é idempotente: pode ser executado múltiplas vezes sem duplicar dados.  
-- A arquitetura separa claramente domínio, acesso a dados e camada GraphQL.  
+- A arquitetura separa claramente domínio, acesso a dados e camada GraphQL.
 - Testes unitários focam na lógica de serviço; testes E2E validam a integração completa via GraphQL.
